@@ -282,6 +282,9 @@ class _HomeState extends State<Home> {
     });
   }
 
+  double elevation = 2;
+  double separacao = 10;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -293,21 +296,15 @@ class _HomeState extends State<Home> {
         child: Center(
           child: Column(
             children: [
+              const Padding(padding: EdgeInsets.all(10)),
               QRcodeGerado
                   ? Container()
-                  : Padding(
-                      padding: const EdgeInsets.all(10.0),
+                  : SizedBox(
+                      height: 450,
+                      width: 450,
                       child: Card(
-                        elevation: 5,
-                        //color: const Color(0x00000000),
-                        // shape: RoundedRectangleBorder(
-                        //   borderRadius:
-                        //       BorderRadius.circular(8), // if you need this
-                        //   side: BorderSide(
-                        //     color: Colors.grey.withOpacity(0.2),
-                        //     width: 2,
-                        //   ),
-                        // ),
+                        elevation: elevation,
+                        color: const Color(0xfffcf7f7),
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Column(
@@ -316,226 +313,279 @@ class _HomeState extends State<Home> {
                                 key: _formKey,
                                 child: Column(
                                   children: [
-                                    TextFormField(
-                                      controller: _chavePix,
-                                      onSaved: (valor) {
-                                        setState(() {
-                                          _chave = valor!;
-                                          if (_chave!.length == 11) {
-                                            iscpf = true;
+                                    Material(
+                                      borderRadius: BorderRadius.circular(10),
+                                      elevation: elevation,
+                                      shadowColor: Colors.grey,
+                                      child: TextFormField(
+                                        controller: _chavePix,
+                                        onSaved: (valor) {
+                                          setState(() {
+                                            _chave = valor!;
+                                            if (_chave!.length == 11) {
+                                              iscpf = true;
+                                            }
+                                          });
+                                        },
+                                        inputFormatters: iscpf
+                                            ? [
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                                CpfInputFormatter()
+                                              ]
+                                            : null,
+                                        decoration: InputDecoration(
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: const BorderSide(
+                                                color: Colors.red,
+                                                width: 10,
+                                                style: BorderStyle.solid,
+                                              ),
+                                            ),
+                                            // enabledBorder: OutlineInputBorder(
+                                            //   borderSide: const BorderSide(
+                                            //       color: Colors.grey),
+                                            //   borderRadius:
+                                            //       BorderRadius.circular(20),
+                                            // ),
+                                            // focusedBorder: OutlineInputBorder(
+                                            //   borderSide: const BorderSide(
+                                            //       color: Colors.blue),
+                                            //   borderRadius:
+                                            //       BorderRadius.circular(5),
+                                            // ),
+                                            labelText: iscpf ? "CPF" : "Chave",
+                                            fillColor: Colors.white,
+                                            filled: true,
+                                            hintText: "Digite a chave"),
+                                        validator: (valor) {
+                                          return Validador()
+                                              .add(Validar.OBRIGATORIO,
+                                                  msg: "Campo obrigatório")
+                                              .valido(valor);
+                                        },
+                                      ),
+                                    ),
+
+                                    Padding(padding: EdgeInsets.all(separacao)),
+
+                                    Material(
+                                      borderRadius: BorderRadius.circular(10),
+                                      elevation: elevation,
+                                      shadowColor: Colors.grey,
+                                      child: TextFormField(
+                                        controller: _valorDoPix,
+                                        keyboardType: TextInputType.number,
+                                        onSaved: (valor) {
+                                          _valor = valor!
+                                              .replaceAll(".", "")
+                                              .replaceAll(" ", "")
+                                              .replaceAll(",", ".")
+                                              .replaceAll("R\$", "");
+                                        },
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                          // RealInputFormatter(
+                                          //   moeda: true,
+                                          // ),
+                                          CentavosInputFormatter(
+                                              moeda: true, casasDecimais: 2)
+                                        ],
+                                        decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.grey),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.blue),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            labelText: "Valor (opcional)",
+                                            hintText: "Digite o valor"),
+                                      ),
+                                    ),
+                                    Padding(padding: EdgeInsets.all(separacao)),
+                                    Material(
+                                      borderRadius: BorderRadius.circular(10),
+                                      elevation: elevation,
+                                      shadowColor: Colors.grey,
+                                      child: TextFormField(
+                                        //até 25 caracteres
+                                        controller: _nomeBeneficiario,
+                                        keyboardType: TextInputType.text,
+                                        onSaved: (valor) {
+                                          if (valor != "") {
+                                            _beneficiario = valor!;
                                           }
-                                        });
-                                      },
-                                      inputFormatters: iscpf
-                                          ? [
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
-                                              CpfInputFormatter()
-                                            ]
-                                          : null,
-                                      decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.blue),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          labelText: iscpf ? "CPF" : "Chave",
-                                          hintText: "Digite a chave"),
-                                      validator: (valor) {
-                                        return Validador()
-                                            .add(Validar.OBRIGATORIO,
-                                                msg: "Campo obrigatório")
-                                            .valido(valor);
-                                      },
+                                        },
+                                        decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.grey),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.blue),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            labelText:
+                                                "Beneficiário (opcional)",
+                                            hintText:
+                                                "Digite o nome do beneficiário"),
+                                      ),
                                     ),
-                                    const Padding(padding: EdgeInsets.all(5)),
-                                    TextFormField(
-                                      controller: _valorDoPix,
-                                      keyboardType: TextInputType.number,
-                                      onSaved: (valor) {
-                                        _valor = valor!
-                                            .replaceAll(".", "")
-                                            .replaceAll(" ", "")
-                                            .replaceAll(",", ".")
-                                            .replaceAll("R\$", "");
-                                      },
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        // RealInputFormatter(
-                                        //   moeda: true,
-                                        // ),
-                                        CentavosInputFormatter(
-                                            moeda: true, casasDecimais: 2)
-                                      ],
-                                      decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.blue),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          labelText: "Valor",
-                                          hintText:
-                                              "Digite o valor (opcional)"),
-                                    ),
-                                    const Padding(padding: EdgeInsets.all(5)),
-                                    TextFormField(
-                                      //até 25 caracteres
-                                      controller: _nomeBeneficiario,
-                                      keyboardType: TextInputType.text,
-                                      onSaved: (valor) {
-                                        if (valor != "") {
-                                          _beneficiario = valor!;
-                                        }
-                                      },
-                                      decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.blue),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          labelText: "Beneficiário",
-                                          hintText:
-                                              "Digite o nome do beneficiário (opcional)"),
-                                    ),
-                                    const Padding(padding: EdgeInsets.all(5)),
+                                    Padding(padding: EdgeInsets.all(separacao)),
                                     //Até 15 caracteres
-                                    TextFormField(
-                                      controller: _nomeCidade,
-                                      keyboardType: TextInputType.text,
-                                      onSaved: (valor) {
-                                        if (valor != "") {
-                                          _cidade = valor!;
-                                        }
-                                      },
-                                      decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.blue),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          labelText: "Cidade",
-                                          hintText:
-                                              "Digite a cidade (opcional)"),
+                                    Material(
+                                      borderRadius: BorderRadius.circular(10),
+                                      elevation: elevation,
+                                      shadowColor: Colors.grey,
+                                      child: TextFormField(
+                                        controller: _nomeCidade,
+                                        keyboardType: TextInputType.text,
+                                        onSaved: (valor) {
+                                          if (valor != "") {
+                                            _cidade = valor!;
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.grey),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.blue),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            labelText: "Cidade (opcional)",
+                                            hintText: "Digite a cidade"),
+                                      ),
                                     ),
-                                    const Padding(padding: EdgeInsets.all(5)),
+                                    Padding(padding: EdgeInsets.all(separacao)),
                                     //Até 20 caracteres
-                                    TextFormField(
-                                      controller: _descricaoTransferencia,
-                                      keyboardType: TextInputType.text,
-                                      onSaved: (valor) {
-                                        if (valor != "") {
-                                          _descricao = valor!;
-                                        }
-                                      },
-                                      decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.grey),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.blue),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          labelText: "Descrição",
-                                          hintText:
-                                              "Digite uma descrição (opcional)"),
+                                    Material(
+                                      borderRadius: BorderRadius.circular(10),
+                                      elevation: elevation,
+                                      shadowColor: Colors.grey,
+                                      child: TextFormField(
+                                        controller: _descricaoTransferencia,
+                                        keyboardType: TextInputType.text,
+                                        onSaved: (valor) {
+                                          if (valor != "") {
+                                            _descricao = valor!;
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.grey),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.blue),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            labelText: "Descrição (opcional)",
+                                            hintText: "Digite uma descrição"),
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const Padding(padding: EdgeInsets.all(5)),
+                              Padding(padding: EdgeInsets.all(separacao)),
                             ],
                           ),
                         ),
                       ),
                     ),
               Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: QRcodeGerado
-                      ? ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              QRcodeGerado = false;
-                            });
-                          },
-                          child: const Text(
-                            "Gerar outro QR code",
-                            style: TextStyle(),
-                          ))
-                      : ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              _gerarPayloadFormatIndicator();
-                              _gerarMerchantAccountInformation();
-                              _gerarMerchantCategoryCode();
-                              _gerarTransactionCurrency();
-                              _gerarTransactionAmount();
-                              _gerarCountryCode();
-                              _gerarMerchantName();
-                              _gerarMerchantCity();
-                              _gerarAdditionalDataField();
-                              setState(() {
-                                _textoQRcode = PayloadFormatIndicator +
-                                    MerchantAccountInformation +
-                                    MerchantCategoryCode +
-                                    TransactionCurrency +
-                                    TransactionAmount +
-                                    CountryCode +
-                                    MerchantName +
-                                    MerchantCity +
-                                    AdditionalDataField;
-                                QRcodeGerado = true;
-                              });
-                              _gerartextoQRcodemenosCRC16CCITT(_textoQRcode);
-                              _gerarCRC16_CCITT(_textoQRcodemenosCRC16CCITT);
-                              _gerarTextoQRcodeCompleto();
-                              _gerarQRcode();
-                              _rolarParaFimScrollController();
-                            }
-                          },
-                          child: QRcodeGerado
-                              ? const Text(
-                                  "Gerar outro QRCode",
-                                  style: TextStyle(),
-                                )
-                              : const Text(
-                                  "Gerar QRCode",
-                                  style: TextStyle(),
-                                ),
-                        )),
+                padding: const EdgeInsets.all(10),
+                child: QRcodeGerado
+                    ? ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            QRcodeGerado = false;
+                          });
+                        },
+                        child: const Text(
+                          "Gerar outro QR code",
+                          style: TextStyle(),
+                        ))
+                    : SizedBox(
+                        width: 450,
+                        height: 100,
+                        child: Card(
+                          elevation: elevation,
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: elevation,
+                              ),
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  _gerarPayloadFormatIndicator();
+                                  _gerarMerchantAccountInformation();
+                                  _gerarMerchantCategoryCode();
+                                  _gerarTransactionCurrency();
+                                  _gerarTransactionAmount();
+                                  _gerarCountryCode();
+                                  _gerarMerchantName();
+                                  _gerarMerchantCity();
+                                  _gerarAdditionalDataField();
+                                  setState(() {
+                                    _textoQRcode = PayloadFormatIndicator +
+                                        MerchantAccountInformation +
+                                        MerchantCategoryCode +
+                                        TransactionCurrency +
+                                        TransactionAmount +
+                                        CountryCode +
+                                        MerchantName +
+                                        MerchantCity +
+                                        AdditionalDataField;
+                                    QRcodeGerado = true;
+                                  });
+                                  _gerartextoQRcodemenosCRC16CCITT(
+                                      _textoQRcode);
+                                  _gerarCRC16_CCITT(
+                                      _textoQRcodemenosCRC16CCITT);
+                                  _gerarTextoQRcodeCompleto();
+                                  _gerarQRcode();
+                                  _rolarParaFimScrollController();
+                                }
+                              },
+                              child: QRcodeGerado
+                                  ? const Text(
+                                      "Gerar outro QRCode",
+                                      style: TextStyle(),
+                                    )
+                                  : const Text(
+                                      "Gerar QRCode",
+                                      style: TextStyle(),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
               QRcodeGerado
                   ? Padding(
                       padding: const EdgeInsets.all(10.0),
